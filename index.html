@@ -550,11 +550,11 @@
     }
 
     // จัดการ Event ติดตั้งแอป (Android Chrome / Desktop Edge / Samsung Internet)
+    // Android: แถบขึ้นเฉพาะเมื่อ Chrome ส่ง beforeinstallprompt มา = ติดตั้งได้แน่นอน
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
       window.deferredPrompt = e;
-      // beforeinstallprompt พร้อม → แสดงเร็วขึ้น (ยกเลิก timer เดิม แล้วตั้งใหม่ทันที)
       if (bannerTimer) { clearTimeout(bannerTimer); bannerTimer = null; }
       scheduleShowBanner(800);
     });
@@ -569,11 +569,9 @@
       if (isIos()) {
         // iOS Safari: แสดงแถบเสมอ (ไม่มี beforeinstallprompt บน iOS)
         scheduleShowBanner(1500);
-      } else {
-        // Android: แสดงแถบเสมอ ไม่ว่า beforeinstallprompt จะยิงมาหรือไม่
-        // ถ้า beforeinstallprompt ยิงมาก่อน timer นี้ จะถูก scheduleShowBanner(800) แทน
-        scheduleShowBanner(2000);
       }
+      // Android: ไม่ตั้ง timer ที่นี่ — รอ beforeinstallprompt เท่านั้น
+      // ถ้า Chrome ไม่ยิง beforeinstallprompt = Chrome ยังไม่พร้อม → ไม่แสดงแถบดีกว่า
     }
 
     // ดักจับเมื่อผู้ใช้ติดตั้งสำเร็จ
@@ -661,79 +659,51 @@
       if (guideModal) guideModal.classList.remove('show');
     }
 
-    // เมื่อกดคลิกที่แถบติดตั้ง (ติดตั้งทันทีบน Android Chrome / แสดงวิธีติดตั้งบน iOS Safari)
+    // เมื่อกดปุ่ม "ติดตั้ง" บนแถบ Floating Pill
     async function handlePwaClick(e) {
       if (e) {
         e.preventDefault();
         e.stopPropagation();
       }
 
-      // 1. ตรวจจับการเปิดผ่าน In-App Browser (LINE / Facebook / Instagram / Messenger)
+      // In-App Browser (LINE / Facebook / Instagram / Messenger) → แนะนำให้เปิด Chrome ก่อน
       const ua = (navigator.userAgent || '').toLowerCase();
-      const isInApp = ua.includes('line') || ua.includes('fban') || ua.includes('fbav') || ua.includes('instagram') || ua.includes('messenger');
+      const isInApp = ua.includes('line') || ua.includes('fban') || ua.includes('fbav') ||
+                      ua.includes('instagram') || ua.includes('messenger');
       if (isInApp) {
         slideDownBanner();
         showGuideModal('inapp');
         return;
       }
 
-      // 2. กรณี Android / Chromium / Desktop Edge: ดำเนินการติดตั้งทันที
-      if (!isIos()) {
-        let promptEvent = deferredPrompt || window.deferredPrompt;
-
-        // หากยังไม่มี promptEvent ณ จังหวะที่แตะ ให้รอสัญญาณ pwa-ready เล็กน้อย (ไม่เกิน 1.2 วินาที)
-        if (!promptEvent) {
-          const btn = document.getElementById('btn-install');
-          const originalContent = btn ? btn.innerHTML : 'ติดตั้ง';
-          if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังติดตั้ง...';
-
-          await new Promise((resolve) => {
-            const onReady = () => {
-              window.removeEventListener('pwa-ready', onReady);
-              resolve();
-            };
-            window.addEventListener('pwa-ready', onReady);
-            setTimeout(() => {
-              window.removeEventListener('pwa-ready', onReady);
-              resolve();
-            }, 1200);
-          });
-
-          if (btn) btn.innerHTML = originalContent;
-          promptEvent = deferredPrompt || window.deferredPrompt;
-        }
-
-        // เรียก Native Prompt ของ Android Chrome ขึ้นมาทันที
-        if (promptEvent) {
-          deferredPrompt = null;
-          window.deferredPrompt = null;
-
-          try {
-            promptEvent.prompt();
-            const choiceResult = await promptEvent.userChoice;
-            if (choiceResult && choiceResult.outcome === 'accepted') {
-              try {
-                localStorage.setItem('sbb_pwa_installed', 'true');
-              } catch (err) {}
-              slideDownBanner();
-            }
-          } catch (err) {
-            console.warn('Install prompt error:', err);
-            slideDownBanner();
-            showGuideModal('android');
-          }
-          return;
-        }
-
-        // หากไม่สามารถเรียก Native Prompt ได้ (เช่น เปิดใน Browser ที่ไม่รองรับ PWA)
+      // iOS Safari → แสดงคู่มือ Share > Add to Home Screen
+      if (isIos()) {
         slideDownBanner();
-        showGuideModal('android');
+        showGuideModal('ios');
         return;
       }
 
-      // 3. กรณี iOS Safari: แสดงคำแนะนำการเพิ่มลงหน้าจอโฮม
-      slideDownBanner();
-      showGuideModal('ios');
+      // Android / Chrome / Edge / Samsung:
+      // แถบขึ้นมาได้ก็ต่อเมื่อ beforeinstallprompt พร้อมแล้ว → เรียก prompt() ทันที
+      const promptEvent = deferredPrompt || window.deferredPrompt;
+      if (promptEvent) {
+        deferredPrompt = null;
+        window.deferredPrompt = null;
+        try {
+          promptEvent.prompt();
+          const choiceResult = await promptEvent.userChoice;
+          if (choiceResult && choiceResult.outcome === 'accepted') {
+            try { localStorage.setItem('sbb_pwa_installed', 'true'); } catch (err) {}
+            slideDownBanner();
+          }
+        } catch (err) {
+          console.warn('Install prompt error:', err);
+          slideDownBanner();
+        }
+      } else {
+        // กรณีไม่น่าเกิด: แถบขึ้นมาแต่ prompt หายไปแล้ว → ปิดแถบเฉยๆ
+        slideDownBanner();
+      }
     }
   </script>
 </body>
