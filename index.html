@@ -3,20 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>SB school</title>
+  <title>Sitabutr bamrung School</title>
 
   <!-- PWA Primary Meta Tags -->
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
   <link rel="icon" type="image/png" sizes="32x32" href="./favicon.png">
-  <meta name="theme-color" content="#1B3B6F">
+  <meta name="theme-color" content="#0f172a">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="application-name" content="SB school">
+  <meta name="application-name" content="Sitabutr bamrung School">
 
   <!-- iOS Safari PWA Meta Tags -->
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="SB school">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Sitabutr bamrung School">
   <link rel="apple-touch-icon" href="./apple-touch-icon.png">
   <link rel="apple-touch-icon-precomposed" href="./apple-touch-icon.png">
 
@@ -34,10 +34,15 @@
     }
 
     html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background-color: #1B3B6F;
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 100% !important;
+      min-height: 100vh !important;
+      min-height: 100dvh !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+      background-color: #0f172a !important;
       font-family: 'Prompt', 'Sarabun', sans-serif;
     }
 
@@ -45,9 +50,12 @@
     #appFrame {
       width: 100%;
       height: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
       border: none;
+      outline: none;
       display: block;
-      background: #ffffff;
+      background: #0f172a;
     }
 
     /* Splash / Loading Screen */
@@ -95,7 +103,7 @@
     }
 
     .splash-title {
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 800;
       letter-spacing: -0.5px;
       margin-bottom: 6px;
@@ -135,191 +143,210 @@
       100% { left: 100%; width: 30%; }
     }
 
-    /* Floating Install Trigger Button */
-    .pwa-floating-install {
+    /* ==========================================================================
+       SINGLE-LINE FLOATING PILL POPUP (บรรทัดเดียวยาวสวยๆ)
+       ========================================================================== */
+    .sbb-pwa-floating-pill {
       position: fixed;
       bottom: 24px;
       left: 50%;
-      transform: translateX(-50%);
-      background: #ffffff;
-      color: #1B3B6F;
-      border: none;
+      transform: translateX(-50%) translateY(120px);
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      color: #1e3a8a;
+      border: 1.8px solid #2563eb;
       border-radius: 999px;
-      padding: 12px 24px;
+      padding: 7px 10px 7px 20px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      box-shadow: 0 12px 32px -4px rgba(37, 99, 235, 0.35), 0 4px 14px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      z-index: 999999;
+      user-select: none;
+      -webkit-user-select: none;
+      opacity: 0;
+      transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease, box-shadow 0.25s ease;
+      font-family: 'Prompt', -apple-system, BlinkMacSystemFont, sans-serif;
+      white-space: nowrap;
+      width: auto;
+      max-width: calc(100vw - 28px);
+      box-sizing: border-box;
+    }
+
+    .sbb-pwa-floating-pill.sbb-pill-visible {
+      opacity: 1 !important;
+      transform: translateX(-50%) translateY(0) !important;
+      animation: sbbPillFloat 3.8s ease-in-out infinite 0.5s;
+    }
+
+    .sbb-pwa-floating-pill.sbb-pill-closing {
+      opacity: 0 !important;
+      transform: translateX(-50%) translateY(130px) !important;
+      animation: none !important;
+      transition: transform 0.35s cubic-bezier(0.4, 0, 1, 1), opacity 0.35s ease !important;
+    }
+
+    @keyframes sbbPillFloat {
+      0%, 100% {
+        transform: translateX(-50%) translateY(0);
+      }
+      50% {
+        transform: translateX(-50%) translateY(-5px);
+      }
+    }
+
+    .sbb-pwa-floating-pill:hover {
+      box-shadow: 0 16px 36px -4px rgba(37, 99, 235, 0.45), 0 6px 16px rgba(0, 0, 0, 0.16);
+      border-color: #1d4ed8;
+    }
+
+    .sbb-pwa-floating-pill:active {
+      transform: translateX(-50%) scale(0.96) !important;
+    }
+
+    .sbb-pwa-pill-text {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sbb-pwa-pill-icon {
+      font-size: 20px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .sbb-pwa-pill-title {
       font-size: 14.5px;
       font-weight: 700;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25), 0 0 0 2px #3b82f6;
-      cursor: pointer;
-      z-index: 990;
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      animation: sbbFloatBtn 4s ease-in-out infinite;
+      color: #1B3B6F;
+      letter-spacing: -0.2px;
+      white-space: nowrap;
     }
 
-    @keyframes sbbFloatBtn {
-      0%, 100% { transform: translate(-50%, 0); }
-      50% { transform: translate(-50%, -6px); }
-    }
-
-    .pwa-floating-install:hover {
-      transform: translate(-50%, -3px) scale(1.03);
-      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
-    }
-
-    .pwa-floating-install .badge {
-      background: #2563eb;
+    .sbb-pwa-pill-badge {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
       color: #ffffff;
-      padding: 3px 8px;
-      border-radius: 20px;
-      font-size: 11px;
+      border-radius: 999px;
+      padding: 6px 15px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12.5px;
+      font-weight: 700;
+      white-space: nowrap;
+      box-shadow: 0 3px 10px rgba(37, 99, 235, 0.35);
+      flex-shrink: 0;
+      letter-spacing: 0.2px;
     }
 
-    /* Modal Backdrop */
-    .modal-backdrop {
+    .sbb-pwa-pill-badge span {
+      display: inline;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 440px) {
+      .sbb-pwa-floating-pill {
+        padding: 6px 8px 6px 14px;
+        gap: 10px;
+        height: 48px;
+        max-width: calc(100vw - 20px);
+      }
+      .sbb-pwa-pill-icon {
+        font-size: 17px;
+      }
+      .sbb-pwa-pill-title {
+        font-size: 13px;
+      }
+      .sbb-pwa-pill-badge {
+        padding: 5px 12px;
+        height: 32px;
+        font-size: 11.5px;
+      }
+    }
+
+    @media (max-width: 370px) {
+      .sbb-pwa-floating-pill {
+        padding: 5px 6px 5px 10px;
+        gap: 7px;
+        height: 44px;
+        max-width: calc(100vw - 16px);
+      }
+      .sbb-pwa-pill-icon {
+        font-size: 15px;
+      }
+      .sbb-pwa-pill-title {
+        font-size: 12px;
+      }
+      .sbb-pwa-pill-badge {
+        padding: 4px 9px;
+        height: 28px;
+        font-size: 10.5px;
+      }
+    }
+
+    /* iOS Instruction Modal */
+    .sbb-pwa-ios-modal {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(15, 23, 42, 0.65);
+      background: rgba(15, 23, 42, 0.72);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       justify-content: center;
-      z-index: 10000;
-      padding: 20px;
+      z-index: 9999999;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
     }
 
-    .modal-backdrop.active {
+    .sbb-pwa-ios-modal.active {
       opacity: 1;
       pointer-events: auto;
     }
 
-    .modal-box {
+    .sbb-pwa-ios-sheet {
       width: 100%;
-      max-width: 410px;
+      max-width: 480px;
       background: #ffffff;
-      border-radius: 24px;
-      padding: 26px 22px;
-      text-align: center;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
-      position: relative;
-      transform: scale(0.92);
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      border-top-left-radius: 28px;
+      border-top-right-radius: 28px;
+      padding: 24px 20px 32px 20px;
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3);
+      transform: translateY(100%);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .modal-backdrop.active .modal-box {
-      transform: scale(1);
+    .sbb-pwa-ios-modal.active .sbb-pwa-ios-sheet {
+      transform: translateY(0);
     }
 
-    .modal-close {
-      position: absolute;
-      top: 14px;
-      right: 14px;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: #f1f5f9;
-      border: none;
-      font-size: 18px;
-      color: #64748b;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .modal-logo {
-      width: 76px;
-      height: 76px;
-      border-radius: 20px;
-      background: #eff6ff;
-      padding: 10px;
-      margin: 0 auto 12px auto;
-      display: block;
-      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
-    }
-
-    .modal-title {
-      font-size: 20px;
-      font-weight: 800;
-      color: #1B3B6F;
-      margin-bottom: 4px;
-    }
-
-    .modal-desc {
-      font-size: 13.5px;
-      color: #64748b;
-      margin-bottom: 20px;
-      line-height: 1.4;
-    }
-
-    .modal-features {
-      background: #f8fafc;
-      border: 1px solid #edf2f7;
-      border-radius: 16px;
-      padding: 14px 16px;
-      margin-bottom: 20px;
-      text-align: left;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      font-size: 13px;
-    }
-
-    .modal-feature-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: #334155;
-    }
-
-    .btn-install-primary {
-      width: 100%;
-      height: 48px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #1B3B6F 0%, #2563eb 100%);
-      color: #ffffff;
-      border: none;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
-      margin-bottom: 10px;
-      transition: transform 0.2s ease;
-    }
-
-    .btn-install-primary:active {
-      transform: scale(0.97);
-    }
-
-    .btn-dismiss {
-      background: none;
-      border: none;
-      color: #94a3b8;
-      font-size: 13.5px;
-      cursor: pointer;
-      padding: 6px;
-    }
-
-    /* iOS Guide Box */
     .ios-step {
       display: flex;
       align-items: flex-start;
       gap: 12px;
-      padding: 10px 12px;
+      padding: 12px 14px;
       background: #f8fafc;
-      border-radius: 12px;
+      border-radius: 14px;
       border: 1px solid #e2e8f0;
-      text-align: left;
       margin-bottom: 10px;
-      font-size: 13px;
+      font-size: 13.5px;
+      color: #334155;
     }
 
     .ios-step-num {
@@ -338,8 +365,8 @@
 
     /* Standalone Mode: ซ่อนปุ่มติดตั้งอัตโนมัติ */
     @media all and (display-mode: standalone) {
-      .pwa-floating-install,
-      .modal-backdrop {
+      .sbb-pwa-floating-pill,
+      .sbb-pwa-ios-modal {
         display: none !important;
       }
     }
@@ -350,9 +377,9 @@
   <!-- 1. หน้าจอ Splash ตอนเปิดแอป -->
   <div id="splashScreen">
     <div class="splash-logo-box">
-      <img src="./icon-192.png" alt="SB school Logo">
+      <img src="./icon-192.png" alt="Sitabutr bamrung School Logo">
     </div>
-    <div class="splash-title">SB school</div>
+    <div class="splash-title">Sitabutr bamrung School</div>
     <div class="splash-subtitle">โรงเรียนสีตบุตรบำรุง</div>
     <div class="splash-loader-bar"></div>
   </div>
@@ -362,60 +389,45 @@
     id="appFrame" 
     src="https://script.google.com/macros/s/AKfycbyGK_eolAztT7gsoRXav9pI9mIshNwvg2lLPmZ5zajsKRKsCGna4_KpCPwyZwo1YYb5Rg/exec"
     allow="fullscreen; camera; microphone; geolocation; autoplay"
-    title="SB school Web App"
+    title="Sitabutr bamrung School Web App"
   ></iframe>
 
-  <!-- 3. ปุ่มลอยสำหรับกดติดตั้งแอป (แสดงเฉพาะเมื่อยังไม่ได้ติดตั้ง) -->
-  <button id="btnFloatInstall" class="pwa-floating-install" onclick="openInstallModal()" style="display:none;">
-    <span>📲 ติดตั้งแอป SB school</span>
-    <span class="badge">เร็ว & เต็มจอ</span>
-  </button>
+  <!-- 3. Popup ติดตั้งแอปแถวเดียว ทรงแคปซูลยาว แนวนอน สไลด์ขึ้นมาจากด้านล่าง -->
+  <div id="sbbPwaFloatingPill" class="sbb-pwa-floating-pill" onclick="triggerPwaInstall()" style="display:none;" title="แตะเพื่อติดตั้งแอป Sitabutr bamrung School">
+    <div class="sbb-pwa-pill-text">
+      <span class="sbb-pwa-pill-icon">📲</span>
+      <span class="sbb-pwa-pill-title">ติดตั้งแอป Sitabutr bamrung School</span>
+    </div>
+    <div class="sbb-pwa-pill-badge">
+      <span>เร็ว &amp; เต็มจอ</span>
+    </div>
+  </div>
 
-  <!-- 4. Popup Modal ติดตั้งแอป (Android & iOS) -->
-  <div id="installModal" class="modal-backdrop">
-    <div class="modal-box">
-      <button class="modal-close" onclick="closeInstallModal()">&times;</button>
-      <img src="./icon-192.png" alt="SB school Logo" class="modal-logo">
-      <h3 class="modal-title">ติดตั้งแอป SB school</h3>
-      <p class="modal-desc">โรงเรียนสีตบุตรบำรุง (เข้าใช้งานง่ายผ่านหน้าจอมือถือ)</p>
-
-      <div class="modal-features">
-        <div class="modal-feature-row">
-          <span>⚡</span>
-          <span>เปิดใช้งานได้ใน 1 วินาที ไม่ต้องเข้าเบราว์เซอร์</span>
-        </div>
-        <div class="modal-feature-row">
-          <span>📱</span>
-          <span>หน้าจอเต็มจอ (Full Screen) ไร้แถบ URL รบกวนสายตา</span>
-        </div>
-        <div class="modal-feature-row">
-          <span>🔔</span>
-          <span>เช็กยอดเงิน ผลการเรียน และตารางเรียนสะดวกรวดเร็ว</span>
-        </div>
+  <!-- 4. แผ่นพับแนะนำการติดตั้งสำหรับ iPhone / iPad (iOS Sheet) -->
+  <div id="sbbIosModal" class="sbb-pwa-ios-modal" onclick="closeIosSheet(event)">
+    <div class="sbb-pwa-ios-sheet" onclick="event.stopPropagation()">
+      <div style="text-align:center; margin-bottom:16px;">
+        <div style="width:40px; height:4px; background:#cbd5e1; border-radius:999px; margin:0 auto 14px auto;"></div>
+        <h3 style="font-size:18px; font-weight:700; color:#1B3B6F;">ติดตั้งแอป Sitabutr bamrung School</h3>
+        <p style="font-size:13px; color:#64748b; margin-top:2px;">วิธีเพิ่มแอปไปยังหน้าจอหลักสำหรับ iOS Safari</p>
       </div>
 
-      <div id="androidActions">
-        <button class="btn-install-primary" onclick="triggerInstallPrompt()">
-          📲 ติดตั้งแอปลงบนอุปกรณ์
-        </button>
+      <div class="ios-step">
+        <div class="ios-step-num">1</div>
+        <div>แตะปุ่ม <strong>แชร์ (Share)</strong> สี่เหลี่ยมลูกศรชี้ขึ้น ที่แถบล่างสุดของ Safari</div>
+      </div>
+      <div class="ios-step">
+        <div class="ios-step-num">2</div>
+        <div>เลื่อนลงแล้วเลือก <strong>"เพิ่มไปยังหน้าจอหลัก" (Add to Home Screen)</strong></div>
+      </div>
+      <div class="ios-step">
+        <div class="ios-step-num">3</div>
+        <div>แตะคำว่า <strong>"เพิ่ม" (Add)</strong> มุมบนขวา จะได้ไอคอนแอปทันที</div>
       </div>
 
-      <div id="iosActions" style="display:none;">
-        <div class="ios-step">
-          <div class="ios-step-num">1</div>
-          <div>แตะปุ่ม <strong>แชร์ (Share)</strong> สี่เหลี่ยมลูกศรชี้ขึ้น ที่แถบล่างสุดของ Safari</div>
-        </div>
-        <div class="ios-step">
-          <div class="ios-step-num">2</div>
-          <div>เลื่อนลงแล้วเลือก <strong>"เพิ่มไปยังหน้าจอหลัก" (Add to Home Screen)</strong></div>
-        </div>
-        <div class="ios-step">
-          <div class="ios-step-num">3</div>
-          <div>แตะคำว่า <strong>"เพิ่ม" (Add)</strong> มุมบนขวา จะได้ไอคอน SB school ทันที!</div>
-        </div>
-      </div>
-
-      <button class="btn-dismiss" onclick="closeInstallModal()">ไว้คราวหลัง</button>
+      <button type="button" style="width:100%; height:46px; border-radius:14px; background:#1B3B6F; color:#ffffff; border:none; font-size:15px; font-weight:700; cursor:pointer; margin-top:10px;" onclick="closeIosSheet()">
+        เข้าใจแล้ว
+      </button>
     </div>
   </div>
 
@@ -442,7 +454,7 @@
       }, 700);
     };
 
-    // Fallback ปิด Splash หลังจาก 3.5 วินาที เผื่อเครือข่ายหน่วง
+    // Fallback ปิด Splash หลังจาก 3.5 วินาที
     setTimeout(() => {
       if (splashScreen && splashScreen.style.display !== 'none') {
         splashScreen.style.opacity = '0';
@@ -453,63 +465,80 @@
     // 3. ตรวจสอบการติดตั้ง PWA
     let deferredPrompt = null;
     const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    const isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || 
+                         window.navigator.standalone === true ||
+                         localStorage.getItem('sbb_pwa_installed') === 'true';
 
-    const btnFloatInstall = document.getElementById('btnFloatInstall');
-    const installModal = document.getElementById('installModal');
-    const androidActions = document.getElementById('androidActions');
-    const iosActions = document.getElementById('iosActions');
+    const pill = document.getElementById('sbbPwaFloatingPill');
+    const iosModal = document.getElementById('sbbIosModal');
+
+    function showFloatingPill() {
+      if (isStandalone || localStorage.getItem('sbb_pwa_installed') === 'true') return;
+      if (pill) {
+        pill.style.display = 'flex';
+        pill.classList.remove('sbb-pill-closing');
+        void pill.offsetWidth;
+        pill.classList.add('sbb-pill-visible');
+      }
+    }
+
+    function slideDownPill(callback) {
+      if (!pill || pill.style.display === 'none') {
+        if (callback) callback();
+        return;
+      }
+      pill.classList.remove('sbb-pill-visible');
+      pill.classList.add('sbb-pill-closing');
+      setTimeout(() => {
+        pill.style.display = 'none';
+        pill.classList.remove('sbb-pill-closing');
+        if (callback) callback();
+      }, 350);
+    }
 
     if (!isStandalone) {
       window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        if (btnFloatInstall) btnFloatInstall.style.display = 'inline-flex';
-        setTimeout(openInstallModal, 1200);
+        setTimeout(showFloatingPill, 900);
       });
 
       if (isIos) {
-        if (btnFloatInstall) btnFloatInstall.style.display = 'inline-flex';
-        if (androidActions) androidActions.style.display = 'none';
-        if (iosActions) iosActions.style.display = 'block';
-        setTimeout(openInstallModal, 1200);
+        setTimeout(showFloatingPill, 1200);
       } else {
-        setTimeout(() => {
-          if (btnFloatInstall) btnFloatInstall.style.display = 'inline-flex';
-        }, 1500);
+        setTimeout(showFloatingPill, 1500);
       }
     }
 
     window.addEventListener('appinstalled', () => {
       deferredPrompt = null;
-      if (btnFloatInstall) btnFloatInstall.style.display = 'none';
-      closeInstallModal();
+      try {
+        localStorage.setItem('sbb_pwa_installed', 'true');
+      } catch (e) {}
+      slideDownPill();
     });
 
-    function openInstallModal() {
-      if (isStandalone) return;
-      if (installModal) installModal.classList.add('active');
+    function triggerPwaInstall() {
+      slideDownPill(() => {
+        try {
+          localStorage.setItem('sbb_pwa_installed', 'true');
+        } catch (e) {}
+
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then((result) => {
+            deferredPrompt = null;
+          });
+        } else if (isIos) {
+          if (iosModal) iosModal.classList.add('active');
+        } else {
+          alert('กรุณาแตะเมนู 3 จุดของเบราว์เซอร์ แล้วเลือก "ติดตั้งแอป" (Install App) หรือ "เพิ่มไปยังหน้าจอหลัก"');
+        }
+      });
     }
 
-    function closeInstallModal() {
-      if (installModal) installModal.classList.remove('active');
-    }
-
-    function triggerInstallPrompt() {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((result) => {
-          if (result && result.outcome === 'accepted') {
-            closeInstallModal();
-          }
-          deferredPrompt = null;
-        });
-      } else if (isIos) {
-        if (androidActions) androidActions.style.display = 'none';
-        if (iosActions) iosActions.style.display = 'block';
-      } else {
-        alert('กรุณาแตะเมนู 3 จุดของเบราว์เซอร์ แล้วเลือก "ติดตั้งแอป" (Install App) หรือ "เพิ่มไปยังหน้าจอหลัก"');
-      }
+    function closeIosSheet(event) {
+      if (iosModal) iosModal.classList.remove('active');
     }
   </script>
 </body>

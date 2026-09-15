@@ -1,9 +1,9 @@
 /**
- * Service Worker for SB school PWA (GitHub Pages Edition)
- * Version: 2.1.0
+ * Service Worker for Sitabutr bamrung School PWA (GitHub Pages Edition)
+ * Version: 3.0.0
  */
 
-const CACHE_NAME = 'sb-school-pwa-v2.1';
+const CACHE_NAME = 'sitabutr-school-pwa-v3.0';
 const PRECACHE_ASSETS = [
   './',
   './index.html',
