@@ -52,15 +52,9 @@
   <!-- Preload Logo (แสดงใน Splash ทันที ไม่รอ DNS) -->
   <link rel="preload" as="image" href="https://lh3.googleusercontent.com/d/1xX85Kyhv36WJJ-0CS35mfKLdy0H0-YU-">
 
-  <!-- Google Fonts: Non-blocking (ไม่บล็อก First Paint) -->
-  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'"
-        href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap">
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap"></noscript>
-
-  <!-- FontAwesome: Non-blocking -->
-  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+  <!-- Google Fonts & FontAwesome (โหลดผ่าน preconnect + Service Worker Cache สะอาดไม่มี Warning) -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 
   <style>
