@@ -554,19 +554,25 @@
       e.preventDefault();
       deferredPrompt = e;
       window.deferredPrompt = e;
+      // beforeinstallprompt พร้อม → แสดงเร็วขึ้น (ยกเลิก timer เดิม แล้วตั้งใหม่ทันที)
+      if (bannerTimer) { clearTimeout(bannerTimer); bannerTimer = null; }
       scheduleShowBanner(800);
     });
 
     window.addEventListener('pwa-ready', () => {
       deferredPrompt = window.deferredPrompt || deferredPrompt;
+      if (bannerTimer) { clearTimeout(bannerTimer); bannerTimer = null; }
       scheduleShowBanner(800);
     });
 
     if (!isAppInstalled()) {
       if (isIos()) {
+        // iOS Safari: แสดงแถบเสมอ (ไม่มี beforeinstallprompt บน iOS)
         scheduleShowBanner(1500);
-      } else if (deferredPrompt || window.deferredPrompt) {
-        scheduleShowBanner(800);
+      } else {
+        // Android: แสดงแถบเสมอ ไม่ว่า beforeinstallprompt จะยิงมาหรือไม่
+        // ถ้า beforeinstallprompt ยิงมาก่อน timer นี้ จะถูก scheduleShowBanner(800) แทน
+        scheduleShowBanner(2000);
       }
     }
 
