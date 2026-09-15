@@ -1,38 +1,42 @@
 /**
  * Service Worker for Sitabutr bamrung School PWA (GitHub Pages Edition)
- * Version: 3.0.0
+ * Version: 3.1.0
  */
 
-const CACHE_NAME = 'sitabutr-school-pwa-v3.0';
-const PRECACHE_ASSETS = [
+const CACHE_NAME = 'sitabutr-parent-pwa-v3.1';
+const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
-  './icon-192.png',
-  './icon-512.png',
-  './apple-touch-icon.png',
-  './favicon.png'
+  'https://lh3.googleusercontent.com/d/1xX85Kyhv36WJJ-0CS35mfKLdy0H0-YU-',
+  'https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap',
+  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];
 
-// 1. Install Event: Cache essential shell assets
+// 1. Install Event: Cache essential assets safely
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(PRECACHE_ASSETS).catch((err) => {
-        console.warn('Pre-caching some assets failed:', err);
-      });
+    caches.open(CACHE_NAME).then(async (cache) => {
+      // Robust caching: ensure single failed CDN request does not block SW installation
+      for (const asset of ASSETS_TO_CACHE) {
+        try {
+          await cache.add(asset);
+        } catch (err) {
+          console.warn('Optional asset caching skipped:', asset, err);
+        }
+      }
     }).then(() => self.skipWaiting())
   );
 });
 
-// 2. Activate Event: Clean up old caches and take control immediately
+// 2. Activate Event: Clean up old caches and claim clients immediately
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
+    caches.keys().then((keys) => {
       return Promise.all(
-        cacheNames.map((cache) => {
-          if (cache !== CACHE_NAME) {
-            return caches.delete(cache);
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
           }
         })
       );
@@ -40,26 +44,29 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// 3. Fetch Event: Network-first for dynamic content, Cache-first for shell assets
+// 3. Fetch Event: Network first with Cache fallback
 self.addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url);
-  if (url.origin === location.origin) {
-    event.respondWith(
-      caches.match(event.request).then((cachedResponse) => {
-        if (cachedResponse) {
-          fetch(event.request).then((networkResponse) => {
-            if (networkResponse && networkResponse.status === 200) {
-              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse));
-            }
-          }).catch(() => {});
-          return cachedResponse;
+  // Only handle GET requests
+  if (event.request.method !== 'GET') return;
+
+  event.respondWith(
+    fetch(event.request)
+      .then((networkResponse) => {
+        // Cache valid local requests dynamically
+        if (networkResponse && networkResponse.status === 200 && event.request.url.startsWith(self.location.origin)) {
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
         }
-        return fetch(event.request);
+        return networkResponse;
       })
-    );
-    return;
-  }
-  event.respondWith(fetch(event.request).catch(() => {
-    return caches.match('./index.html');
-  }));
+      .catch(() => {
+        return caches.match(event.request).then((cachedResponse) => {
+          if (cachedResponse) return cachedResponse;
+          if (event.request.mode === 'navigate') {
+            return caches.match('./index.html');
+          }
+          return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
+        });
+      })
+  );
 });
