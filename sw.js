@@ -3,7 +3,7 @@
  * Version: 3.1.0
  */
 
-const CACHE_NAME = 'sitabutr-parent-pwa-v3.5';
+const CACHE_NAME = 'sitabutr-parent-pwa-v3.6';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

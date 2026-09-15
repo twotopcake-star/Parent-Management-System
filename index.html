@@ -8,7 +8,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#1B3B6F">
   
-  <!-- Apple iOS Standalone -->
+  <!-- Apple iOS + Android Chrome Standalone -->
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Sitabutr bamrung School">
@@ -437,7 +438,7 @@
   <iframe 
     id="app-frame" 
     src="https://script.google.com/macros/s/AKfycbyGK_eolAztT7gsoRXav9pI9mIshNwvg2lLPmZ5zajsKRKsCGna4_KpCPwyZwo1YYb5Rg/exec?pwa_host=github"
-    allow="geolocation; microphone; camera; midi; vr; accelerometer; gyroscope; payment; ambient-light-sensor; fullscreen"
+    allow="geolocation; microphone; camera; midi; accelerometer; gyroscope; payment; fullscreen"
     onload="hideSplash()"
     title="Sitabutr bamrung School Parent Portal"
   ></iframe>
@@ -555,6 +556,9 @@
       e.preventDefault();
       deferredPrompt = e;
       window.deferredPrompt = e;
+      // Chrome ยืนยันว่าแอปยังไม่ได้ติดตั้ง → ล้าง flag เก่า + reset สถานะแถบ
+      try { localStorage.removeItem('sbb_pwa_installed'); } catch (err) {}
+      bannerShown = false;
       if (bannerTimer) { clearTimeout(bannerTimer); bannerTimer = null; }
       scheduleShowBanner(800);
     });
