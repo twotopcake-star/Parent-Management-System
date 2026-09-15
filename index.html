@@ -39,12 +39,30 @@
     }
   </script>
   
-  <!-- Google Fonts & FontAwesome -->
+  <!-- DNS Prefetch & Preconnect (ลด latency ทุก external domain) -->
+  <link rel="dns-prefetch" href="https://lh3.googleusercontent.com">
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+  <link rel="dns-prefetch" href="https://script.google.com">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
+  <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
+
+  <!-- Preload Logo (แสดงใน Splash ทันที ไม่รอ DNS) -->
+  <link rel="preload" as="image" href="https://lh3.googleusercontent.com/d/1xX85Kyhv36WJJ-0CS35mfKLdy0H0-YU-">
+
+  <!-- Google Fonts: Non-blocking (ไม่บล็อก First Paint) -->
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'"
+        href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap"></noscript>
+
+  <!-- FontAwesome: Non-blocking -->
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+
+
   <style>
     * {
       box-sizing: border-box;
@@ -489,8 +507,8 @@
       }, 600);
     }
 
-    // Fallback ปิด Splash หลังจาก 3.5 วินาที
-    setTimeout(hideSplash, 3500);
+    // Fallback ปิด Splash หลังจาก 2 วินาที (ลดจาก 3.5s เพื่อ UX เร็วขึ้น)
+    setTimeout(hideSplash, 2000);
 
     // 2. ตรวจสอบการติดตั้งและอุปกรณ์
     let deferredPrompt = window.deferredPrompt || null;
@@ -578,6 +596,34 @@
       // ถ้า Chrome ไม่ยิง beforeinstallprompt = Chrome ยังไม่พร้อม → ไม่แสดงแถบดีกว่า
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // URL Parameter: ?install=1
+    // แชร์ลิงก์นี้ให้ผู้ปกครองที่อยู่ใน 90 วัน cooldown หรือต้องการติดตั้งใหม่
+    // ตัวอย่าง: https://yoursite.github.io/Parent-Management-System/?install=1
+    // ─────────────────────────────────────────────────────────────────────────
+    (function checkInstallParam() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('install') === '1' && !isAppInstalled()) {
+          // รอให้ DOM พร้อมและ splash หาย ก่อนแสดง guide
+          setTimeout(() => {
+            if (isIos()) {
+              showGuideModal('ios');
+            } else {
+              // ถ้า beforeinstallprompt พร้อมแล้ว → แสดง banner (จะ prompt ทันทีเมื่อกด)
+              // ถ้าไม่พร้อม (cooldown) → แสดง Chrome menu guide โดยตรง
+              const hasPrompt = !!(deferredPrompt || window.deferredPrompt);
+              if (hasPrompt) {
+                showBanner();
+              } else {
+                showGuideModal('android-menu');
+              }
+            }
+          }, 1800);
+        }
+      } catch (e) {}
+    })();
+
     // ดักจับเมื่อผู้ใช้ติดตั้งสำเร็จ
     window.addEventListener('appinstalled', () => {
       deferredPrompt = null;
@@ -634,8 +680,28 @@
             <div>เมื่อเปิดใน Chrome แล้ว ให้แตะปุ่ม <strong>"ติดตั้ง"</strong> ได้ทันทีครับ</div>
           </div>
         `;
+      } else if (type === 'android-menu') {
+        // กรณี: ผู้ใช้เคยกด dismiss (✕) → Chrome cooldown 90 วัน → ให้ใช้ Chrome menu แทน
+        icon.className = 'fa-brands fa-chrome';
+        icon.style.color = '#16a34a';
+        title.innerText = 'ติดตั้งผ่านเมนู Chrome ได้เลย';
+        subtitle.innerText = 'สามารถติดตั้งได้ทุกเมื่อจากเมนู Chrome โดยตรง';
+        stepsList.innerHTML = `
+          <div class="guide-step-item">
+            <div class="step-num">1</div>
+            <div>แตะที่ <strong>จุด 3 จุด ( ⋮ )</strong> มุมบนขวาของ Chrome</div>
+          </div>
+          <div class="guide-step-item">
+            <div class="step-num">2</div>
+            <div>เลือก <strong>"ติดตั้งแอป"</strong> หรือ <strong>"เพิ่มลงในหน้าจอหลัก"</strong></div>
+          </div>
+          <div class="guide-step-item">
+            <div class="step-num">3</div>
+            <div>กด <strong>"ติดตั้ง"</strong> เพื่อยืนยัน — ไอคอนจะปรากฏที่หน้าจอมือถือทันที ✅</div>
+          </div>
+        `;
       } else {
-        // Android (Google Chrome)
+        // Android (Google Chrome) — fallback
         icon.className = 'fa-brands fa-android';
         icon.style.color = '#16a34a';
         title.innerText = 'วิธีติดตั้งแอปบน Android (Google Chrome)';
@@ -697,16 +763,27 @@
           promptEvent.prompt();
           const choiceResult = await promptEvent.userChoice;
           if (choiceResult && choiceResult.outcome === 'accepted') {
+            // ✅ ติดตั้งสำเร็จ
             try { localStorage.setItem('sbb_pwa_installed', 'true'); } catch (err) {}
             slideDownBanner();
+          } else {
+            // ❌ ผู้ใช้กด "ไม่ติดตั้ง" หรือ ✕ ปิด dialog
+            // Chrome เข้า cooldown 90 วัน → beforeinstallprompt จะไม่ยิงอีก
+            // แสดงทางเลือก: ติดตั้งจาก Chrome ⋮ > ติดตั้งแอป
+            slideDownBanner(() => {
+              showGuideModal('android-menu');
+            });
           }
         } catch (err) {
           console.warn('Install prompt error:', err);
           slideDownBanner();
         }
       } else {
-        // กรณีไม่น่าเกิด: แถบขึ้นมาแต่ prompt หายไปแล้ว → ปิดแถบเฉยๆ
-        slideDownBanner();
+        // deferredPrompt หายไปแล้ว (เช่น อยู่ในช่วง 90 วัน cooldown หลัง dismiss)
+        // แสดงวิธีติดตั้งจาก Chrome menu โดยตรง
+        slideDownBanner(() => {
+          showGuideModal('android-menu');
+        });
       }
     }
   </script>
